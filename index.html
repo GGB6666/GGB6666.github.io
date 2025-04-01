@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>石头剪刀布游戏</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 顶部标题 */
+        header {
+            padding: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ffcc;
+            color: #00ffcc;
+            width: 100%;
+            text-align: center;
+            background-color: #1e1e1e;
+            border-bottom: 2px solid #00ffcc;
+        }
+
+        /* 中间游戏区域 */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+        }
+
+        /* 赛博朋克风格按钮 */
+        button {
+            background-color: transparent;
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 20px;
+            color: #00ffcc;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
+
+        button:hover {
+            background-color: #00ffcc;
+            color: #121212;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.7);
+        }
+
+        /* 请出拳提示文字样式 */
+        main p {
+            color: #00ffcc;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* 结果显示样式 */
+        #result {
+            color: #e0e0e0;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        /* 烟花和炸弹效果容器 */
+        #effect-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* 礼花效果样式 */
+        .confetti {
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            background-color: #00ffcc;
+            border-radius: 50%;
+            animation: confetti-fall 2s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* 炸弹爆炸效果 */
+        .bomb {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            animation: bombExplosion 1s ease-out;
+        }
+
+        @keyframes bombExplosion {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(10);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>石头剪刀布小游戏</header>
+    <main>
+        <p>请出拳！</p>
+        <button onclick="play('rock')">石头</button>
+        <button onclick="play('paper')">布</button>
+        <button onclick="play('scissors')">剪刀</button>
+        <p id="result"></p>
+        <div id="effect-container"></div>
+    </main>
+
+    <script>
+        function play(playerChoice) {
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+            let playerChoiceChinese;
+            switch (playerChoice) {
+                case 'rock':
+                    playerChoiceChinese = '石头';
+                    break;
+                case 'paper':
+                    playerChoiceChinese = '布';
+                    break;
+                case 'scissors':
+                    playerChoiceChinese = '剪刀';
+                    break;
+            }
+
+            let computerChoiceChinese;
+            switch (computerChoice) {
+                case 'rock':
+                    computerChoiceChinese = '石头';
+                    break;
+                case 'paper':
+                    computerChoiceChinese = '布';
+                    break;
+                case 'scissors':
+                    computerChoiceChinese = '剪刀';
+                    break;
+            }
+
+            let outcome;
+            if (playerChoice === computerChoice) {
+                outcome = '再来一次！';
+            } else if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                outcome = '你赢了！';
+                showConfetti();
+            } else {
+                outcome = '你输了！';
+                showBombExplosion();
+            }
+
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = `你出了 ${playerChoiceChinese}，我出了 ${computerChoiceChinese}。${outcome}`;
+        }
+
+        function showConfetti() {
+            const container = document.getElementById('effect-container');
+            const colors = ['#00ffcc', '#ffcc00', '#ff00cc', '#00ccff'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '0%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+                container.appendChild(confetti);
+                setTimeout(() => {
+                    confetti.remove();
+                }, 2000);
+            }
+        }
+
+        function showBombExplosion() {
+            const container = document.getElementById('effect-container');
+            const bomb = document.createElement('div');
+            bomb.classList.add('bomb');
+            container.appendChild(bomb);
+            setTimeout(() => {
+                bomb.remove();
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
+    
